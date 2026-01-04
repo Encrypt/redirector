@@ -1,0 +1,39 @@
+---
+# Name of the load balancer, used in logs.
+# It must be unique between all load balancers.
+name: "MinIO"
+
+# Hostname used in the /etc/hosts file.
+local_host: "minio.mydomain.internal"
+
+# List of backend hosts to which <local_host> should be associated.
+# IP addresses will be used as is in the /etc/host file.
+# Hostnames will be resolved before being used in the /etc/host file.
+backend_hosts:
+    - "rack1.node1.minio.mydomain.internal"
+    - "rack1.node2.minio.mydomain.internal"
+    - "rack1.node3.minio.mydomain.internal"
+    - "rack1.node4.minio.mydomain.internal"
+    - "rack1.node5.minio.mydomain.internal"
+
+# Load balancing strategy.
+# Allowed strategies are: "sequential" and "random".
+strategy: "random"
+
+healthcheck:
+
+    # Type of the healthcheck.
+    # Allowed types are: "tcp" and "http".
+    type: "tcp"
+
+    # Time (in seconds) between each healthcheck.
+    period: 5
+
+    config:
+
+        # Port number on which the TCP connection takes place.
+        port: 9000
+
+        # Timeout (in seconds) to establish the TCP connection.
+        #timeout: 10
+...

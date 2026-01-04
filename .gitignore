@@ -1,0 +1,6 @@
+# Compiled code
+__pycache__/
+
+# Packaging
+*.egg-info/
+dist/

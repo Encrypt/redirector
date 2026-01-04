@@ -1,0 +1,40 @@
+---
+################################################################################
+#                                                                              #
+#                           Redirector configuration                           #
+#                                                                              #
+# This file contains the core configuration of the Redirector program.         #
+# All parameters are optional and commented out with their default value.      #
+#                                                                              #
+################################################################################
+
+# Logging level. Allowed values can be found in the Python documentation:
+# https://docs.python.org/3.9/library/logging.html#levels
+#log_level: "INFO"
+
+# Format of the logs. Other attributes can be found in the Python documentation:
+# https://docs.python.org/3.9/library/logging.html#logrecord-attributes
+#log_format: "%(asctime)s :: %(levelname)s :: %(message)s"
+
+# Absolute path to the log file.
+#log_file_path: "/var/log/redirector.log"
+
+# Maximum size of the log file, in bytes. Once this size is reached, the log
+# file rotates.
+#log_file_max_bytes: 5000000
+
+# Maximum number of backup files to keep.
+#log_file_max_backups: 5
+
+# Path to the load balancers configuration directory.
+# It can either be a relative path to the base directory of this configuration
+# file or an absolute path.
+#lb_configs_dir: "lb_configs"
+
+# Boolean defining whether the redirector block in the /etc/hosts file should
+# persist when the program is stopped.
+#persist_hosts_block: true
+
+# Path to the PID file. If not defined, the PID will not be written anywhere.
+#pid_file: null
+...

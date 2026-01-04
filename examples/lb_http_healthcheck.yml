@@ -1,0 +1,76 @@
+---
+# Name of the load balancer, used in logs.
+# It must be unique between all load balancers.
+name: "Elasticsearch"
+
+# Hostname used in the /etc/hosts file.
+local_host: "elasticsearch.mydomain.internal"
+
+# List of backend hosts to which <local_host> should be associated.
+# IP addresses will be used as is in the /etc/host file.
+# Hostnames will be resolved before being used in the /etc/host file.
+backend_hosts:
+    - "10.18.126.13"
+    - "10.42.180.124"
+    - "10.88.129.48"
+    - "10.203.81.22"
+    - "10.210.68.156"
+    - "10.195.61.236"
+
+# Load balancing strategy.
+# Allowed strategies are: "sequential" and "random".
+strategy: "sequential"
+
+healthcheck:
+
+    # Type of the healthcheck.
+    # Allowed types are: "tcp" and "http".
+    type: "http"
+
+    # Time (in seconds) between each healthcheck.
+    period: 5
+
+    config:
+
+        # HTTP method of the request.
+        # Allowed methods are: "HEAD", "GET", "OPTIONS" and "POST".
+        #method: "GET"
+
+        # Headers to add to the healthcheck in the form "key": "value".
+        # Examples: "Host": "elasticsearch.mydomain.internal"
+        #           "Authorization": "Bearer WW91X2p1c3RfbG9zdF90aGVfZ2FtZQ=="
+        #           "Accept": "application/json"
+        #
+        #headers: {}
+
+        # Scheme of the URL
+        # Allowed schemes are: "http" and "https".
+        #scheme: "http"
+
+        # Port number on which the HTTP request is made.
+        port: 9000
+
+        # Path of the HTTP request.
+        path: "/"
+
+        # Optional query to add to the request.
+        #query: null
+
+        # Timeout (in seconds) to establish the HTTP connection.
+        #timeout: 10
+
+        # Path to alternative CA certificates.
+        #cacerts: null
+
+        # Regex to match against the returned HTTP status code.
+        # Examples: "^2" to match any 2xx status code.
+        #           "200|429" to match a 200 or 429 status code.
+        #expected_status: "200"
+
+        # Optional regex to match against the returned HTTP content.
+        # Example: "ready"
+        #expected_response: null
+
+        # Encoding format to use to decode the HTTP content.
+        #expected_response_encoding: "utf-8"
+...
