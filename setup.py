@@ -17,13 +17,13 @@ setup(
     url="https://github.com/Encrypt/redirector",
     packages=find_packages(exclude=["tests"]),
     install_requires=[
-        "cerberus==1.3.8",
-        "pyyaml==6.0.3"
+        "cerberus>=1.3.5,<=1.3.8",
+        "pyyaml>=6.0.1,<=6.0.3"
     ],
     entry_points={
         "console_scripts": [
             "redirector=redirector.cli:main"
         ]
     },
-    python_requires=">=3.9"
+    python_requires=">=3.6"
 )

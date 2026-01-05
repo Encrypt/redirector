@@ -9,11 +9,11 @@
 ################################################################################
 
 # Logging level. Allowed values can be found in the Python documentation:
-# https://docs.python.org/3.9/library/logging.html#levels
+# https://docs.python.org/3.6/library/logging.html#logging-levels
 #log_level: "INFO"
 
 # Format of the logs. Other attributes can be found in the Python documentation:
-# https://docs.python.org/3.9/library/logging.html#logrecord-attributes
+# https://docs.python.org/3.6/library/logging.html#logrecord-attributes
 #log_format: "%(asctime)s :: %(levelname)s :: %(message)s"
 
 # Absolute path to the log file.
