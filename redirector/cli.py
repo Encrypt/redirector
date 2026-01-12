@@ -2,7 +2,6 @@ from argparse import ArgumentParser
 from functools import partial
 from redirector import __version__
 from redirector.core import Redirector
-from typing import Optional
 
 import logging
 import signal
@@ -19,9 +18,6 @@ def signal_handler(redirector: Redirector, signum: int, frame) -> None:
     """
     if signum in (signal.SIGINT, signal.SIGTERM):
         redirector.stop()
-    elif signum == signal.SIGHUP:
-        redirector.reload()
-
 
 def main() -> int:
     """Entrypoint of the redirector command.
@@ -45,7 +41,7 @@ def main() -> int:
         return 1
 
     # Attach interrupts and raise exceptions
-    for sig in (signal.SIGINT, signal.SIGTERM, signal.SIGHUP):
+    for sig in (signal.SIGINT, signal.SIGTERM):
         signal.signal(sig, partial(signal_handler, redirector))
 
     try:

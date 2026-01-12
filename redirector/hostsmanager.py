@@ -48,7 +48,7 @@ class HostsManager(object):
         """
 
         # Identify the metadata of the original /etc/hosts file
-        hosts_stat = os.stat("/etc/hosts")
+        hosts_stat = os.stat(HOSTS_FILE_PATH)
         mode = stat.S_IMODE(hosts_stat.st_mode)
         uid = hosts_stat.st_uid
         gid = hosts_stat.st_gid
@@ -73,7 +73,7 @@ class HostsManager(object):
             )
 
         # Replace the /etc/hosts file
-        os.replace(tmp_path, "/etc/hosts")
+        os.replace(tmp_path, HOSTS_FILE_PATH)
 
     def _read_hosts_file(self):
         """Read the /etc/hosts file.
@@ -83,7 +83,7 @@ class HostsManager(object):
         """
 
         # Read the hosts file
-        with open("/etc/hosts", "r") as f:
+        with open(HOSTS_FILE_PATH, "r") as f:
             file_content = f.read()
         file_lines = file_content.splitlines(True)
 

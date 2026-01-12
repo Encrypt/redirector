@@ -43,7 +43,6 @@ class Redirector(object):
     def _initialise_components(self):
         """Initialise the components.
 
-        :configloader: ConfigLoader instance
         :returns: Nothing
         """
 

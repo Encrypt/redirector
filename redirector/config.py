@@ -1,6 +1,5 @@
 from cerberus import Validator
-from redirector.healthchecks import healthchecks, schemas
-from redirector.strategies import strategies
+from redirector.healthchecks import schemas
 
 import logging
 import os
@@ -36,32 +35,40 @@ _CORE_SCHEMA = {
     },
 }
 
-_LOADBALANCER_SCHEMA = {
-    "name": {"type": "string", "required": True},
-    "local_host": {"type": "string", "required": True},
-    "backend_hosts": {
-        "type": "list",
-        "required": True,
-        "minlength": 1,
-        "schema": {"type": "string", "required": True},
-    },
-    "strategy": {
-        "type": "string",
-        "required": True,
-        "allowed": list(strategies.keys()),
-    },
-    "healthcheck": {
-        "schema": {
-            "type": {
-                "type": "string",
-                "required": True,
-                "allowed": list(healthchecks.keys()),
-            },
-            "period": {"type": "float", "required": True, "min": 0},
-            "config": {"type": "dict", "required": True},
-        }
-    },
-}
+def _get_loadbalancer_schema():
+    """Get the load balancer schema with dynamic allowed values.
+
+    :returns: Schema dictionary
+    """
+    from redirector.healthchecks import healthchecks
+    from redirector.strategies import strategies
+
+    return {
+        "name": {"type": "string", "required": True},
+        "local_host": {"type": "string", "required": True},
+        "backend_hosts": {
+            "type": "list",
+            "required": True,
+            "minlength": 1,
+            "schema": {"type": "string", "required": True},
+        },
+        "strategy": {
+            "type": "string",
+            "required": True,
+            "allowed": list(strategies.keys()),
+        },
+        "healthcheck": {
+            "schema": {
+                "type": {
+                    "type": "string",
+                    "required": True,
+                    "allowed": list(healthchecks.keys()),
+                },
+                "period": {"type": "float", "required": True, "min": 0},
+                "config": {"type": "dict", "required": True},
+            }
+        },
+    }
 
 
 class ConfigError(Exception):
@@ -153,7 +160,7 @@ class ConfigLoader(object):
         # For each configuration file...
         for config_file in config_files:
 
-            schema = _LOADBALANCER_SCHEMA.copy()
+            schema = _get_loadbalancer_schema()
             validation_error = (
                 f"Failed to parse the load balancer configuration file {config_file}"
             )
