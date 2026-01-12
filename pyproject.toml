@@ -1,0 +1,35 @@
+[project]
+name = "redirector"
+version = "0.0.0"
+description = "The local DNS load balancer"
+readme = "README.md"
+authors = [
+    { name = "Yann Privé", email = "9038199+Encrypt@users.noreply.github.com" }
+]
+requires-python = ">=3.6"
+dependencies = [
+    "cerberus>=1.3.5,<=1.3.8",
+    "pyyaml>=6.0.1,<=6.0.3"
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0.0",
+    "pytest-cov>=4.0.0",
+    "pytest-mock>=3.10.0"
+]
+
+[project.urls]
+Homepage = "https://github.com/Encrypt/redirector"
+
+[project.scripts]
+redirector = "redirector.cli:main"
+
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["redirector*"]
+exclude = ["tests*"]
