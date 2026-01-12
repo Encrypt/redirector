@@ -1,0 +1,26 @@
+---
+# Simple test configuration for redirector
+name: "Test LB"
+
+# Hostname to add to /etc/hosts
+local_host: "test.redirector.local"
+
+# Backend hosts to check
+backend_hosts:
+    - "127.0.0.1"
+
+# Load balancing strategy
+strategy: "sequential"
+
+healthcheck:
+    # TCP healthcheck on localhost
+    type: "tcp"
+    
+    # Check every 10 seconds
+    period: 10
+    
+    config:
+        # Port 8888 (test HTTP server) should be available on localhost
+        port: 8888
+        timeout: 5
+...
