@@ -1,12 +1,14 @@
-class BaseHealthCheck(object):
-    def __init__(self):
+from abc import ABC, abstractmethod
+from typing import Tuple
+
+
+class BaseHealthCheck(ABC):
+    """Abstract base class for health check implementations."""
+
+    def __init__(self) -> None:
         pass
 
-    def is_alive(self, host):
-        """Perform an healthcheck against the given host.
-
-        :host: Host to check
-        :returns: Tuple (Host alive, message)
-        """
-
-        raise NotImplementedError
+    @abstractmethod
+    def is_alive(self, host: str) -> Tuple[bool, str]:
+        """Perform a healthcheck against the given host."""
+        pass

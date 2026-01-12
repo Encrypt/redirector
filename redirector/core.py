@@ -31,7 +31,7 @@ class Redirector(object):
         handler = RotatingFileHandler(
             self._config["log_file_path"],
             maxBytes=self._config["log_file_max_bytes"],
-            backupCount=self._config["log_file_max_backups"]
+            backupCount=self._config["log_file_max_backups"],
         )
         handler.setFormatter(formatter)
 
@@ -61,7 +61,9 @@ class Redirector(object):
 
                 # Make sure the load balancer name is unique
                 if lb_name in self._load_balancers.keys():
-                    logging.critical('Two load balancers named "{lb_name}" were defined.')
+                    logging.critical(
+                        'Two load balancers named "{lb_name}" were defined.'
+                    )
                     raise RuntimeError()
 
                 # Create the load balancer object

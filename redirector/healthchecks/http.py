@@ -12,72 +12,41 @@ CONFIG_SCHEMA = {
         "type": "string",
         "required": False,
         "allowed": ["HEAD", "GET", "OPTIONS", "POST"],
-        "default": "GET"
+        "default": "GET",
     },
     "headers": {
         "type": "list",
         "required": False,
         "schema": {
             "type": "dict",
-            "keysrules": {
-                "type": "string"
-            },
-            "valuesrules": {
-                "type": "string"
-            }
+            "keysrules": {"type": "string"},
+            "valuesrules": {"type": "string"},
         },
-        "default": {}
+        "default": {},
     },
     "scheme": {
         "type": "string",
         "required": False,
         "allowed": ["http", "https"],
-        "default": "http"
+        "default": "http",
     },
-    "port": {
-        "type": "integer",
-        "required": True,
-        "min": 1,
-        "max": 65535
-    },
-    "path": {
-        "type": "string",
-        "required": True
-    },
-    "query": {
-        "type": "string",
-        "required": False,
-        "nullable": True,
-        "default": None
-    },
-    "timeout": {
-        "type": "float",
-        "required": False,
-        "min": 0,
-        "default": 10
-    },
-    "cacerts": {
-        "type": "string",
-        "required": False,
-        "nullable": True,
-        "default": None
-    },
-    "expected_status": {
-        "type": "string",
-        "required": False,
-        "default": "200"
-    },
+    "port": {"type": "integer", "required": True, "min": 1, "max": 65535},
+    "path": {"type": "string", "required": True},
+    "query": {"type": "string", "required": False, "nullable": True, "default": None},
+    "timeout": {"type": "float", "required": False, "min": 0, "default": 10},
+    "cacerts": {"type": "string", "required": False, "nullable": True, "default": None},
+    "expected_status": {"type": "string", "required": False, "default": "200"},
     "expected_response": {
         "type": "string",
         "required": False,
         "nullable": True,
-        "default": None
+        "default": None,
     },
     "expected_response_encoding": {
         "type": "string",
         "required": False,
-        "default": "utf-8"
-    }
+        "default": "utf-8",
+    },
 }
 
 
@@ -114,23 +83,29 @@ class HttpHealthCheck(BaseHealthCheck):
         url = urlunparse((self._scheme, netloc, self._path, None, self._query, None))
 
         try:
-            request = Request(
-                url,
-                method=self._method,
-                headers=self._headers
-            )
+            request = Request(url, method=self._method, headers=self._headers)
 
-            with urlopen(request, timeout=self._timeout, cafile=self._cacerts) as response:
+            with urlopen(
+                request, timeout=self._timeout, cafile=self._cacerts
+            ) as response:
 
                 # Make sure we didn't get a wrong HTTP status code
                 if re.search(str(response.code), self._expected_status) is None:
-                    return False, f'Got HTTP code "{response.code}" instead of "{self._expected_status}"'
+                    return (
+                        False,
+                        f'Got HTTP code "{response.code}" instead of "{self._expected_status}"',
+                    )
 
                 # If <expected_response> was specified, make sure we didn't get a wrong response
                 if self._expected_response is not None:
-                    decoded_response = response.read().decode(self._expected_response_encoding)
+                    decoded_response = response.read().decode(
+                        self._expected_response_encoding
+                    )
                     if re.search(decoded_response, self._expected_response) is None:
-                        return False, f'The HTTP response didn\'t match the expected response "{self._expected_response}"'
+                        return (
+                            False,
+                            f'The HTTP response didn\'t match the expected response "{self._expected_response}"',
+                        )
 
                 # No error was encountered, the host is alive
                 return True, "OK"

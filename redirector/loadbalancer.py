@@ -21,7 +21,9 @@ class LoadBalancer(Thread):
         self._strategy = strategies[config["strategy"]](config["backend_hosts"])
 
         # Create the healthcheck service
-        self._healthcheck = healthchecks[config["healthcheck"]["type"]](config["healthcheck"]["config"])
+        self._healthcheck = healthchecks[config["healthcheck"]["type"]](
+            config["healthcheck"]["config"]
+        )
 
         # Other instance attributes
         self._lb_name = config["name"]
@@ -50,7 +52,9 @@ class LoadBalancer(Thread):
 
             # If the backend host isn't alive, get the next host
             if not backend_alive:
-                logging.debug(f'Healthcheck for host "{backend_host}" on load balancer "{self._lb_name}" failed. Reason: {msg}.')
+                logging.debug(
+                    f'Healthcheck for host "{backend_host}" on load balancer "{self._lb_name}" failed. Reason: {msg}.'
+                )
                 backend_host = self._strategy.next_host()
                 backend_changed = True
                 timeout = 1
@@ -58,7 +62,9 @@ class LoadBalancer(Thread):
             # If the backend is alive and changed
             if backend_changed and backend_alive:
 
-                logging.info(f'Load balancer "{self._lb_name}" now using backend host "{backend_host}".')
+                logging.info(
+                    f'Load balancer "{self._lb_name}" now using backend host "{backend_host}".'
+                )
 
                 # Inform the program about the DNS change
                 self._queue.put((self._local_host, backend_host))
