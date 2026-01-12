@@ -1,11 +1,14 @@
+from redirector.constants import (
+    HOSTS_FILE_PATH,
+    REDIRECTOR_BEGIN_MARKER,
+    REDIRECTOR_END_MARKER,
+)
+import logging
 import os
 import re
 import socket
 import stat
 import tempfile
-
-_BEGIN_MARKER = "# BEGIN REDIRECTOR MANAGED BLOCK\n"
-_END_MARKER = "# END REDIRECTOR MANAGED BLOCK\n"
 
 
 class HostsManagerError(Exception):
@@ -28,11 +31,11 @@ class HostsManager(object):
         padding = max(len(ip) for ip in self._entries.values()) + 2
 
         # Generate the block
-        block = [_BEGIN_MARKER]
+        block = [REDIRECTOR_BEGIN_MARKER]
         for hostname, ip in self._entries.items():
             padded_ip = ip.ljust(padding)
             block.append(f"{padded_ip}{hostname}\n")
-        block.append(_END_MARKER)
+        block.append(REDIRECTOR_END_MARKER)
 
         return block
 
@@ -45,7 +48,7 @@ class HostsManager(object):
         """
 
         # Identify the metadata of the original /etc/hosts file
-        hosts_stat = os.stat("/etc/hosts")
+        hosts_stat = os.stat(HOSTS_FILE_PATH)
         mode = stat.S_IMODE(hosts_stat.st_mode)
         uid = hosts_stat.st_uid
         gid = hosts_stat.st_gid
@@ -65,10 +68,12 @@ class HostsManager(object):
         try:
             os.chown(tmp_path, uid, gid)
         except PermissionError:
-            raise HostsManagerError(f'Failed to change the owner / group of the temporary hosts file "{tmp_path}".')
+            raise HostsManagerError(
+                f'Failed to change the owner / group of the temporary hosts file "{tmp_path}".'
+            )
 
         # Replace the /etc/hosts file
-        os.replace(tmp_path, "/etc/hosts")
+        os.replace(tmp_path, HOSTS_FILE_PATH)
 
     def _read_hosts_file(self):
         """Read the /etc/hosts file.
@@ -78,7 +83,7 @@ class HostsManager(object):
         """
 
         # Read the hosts file
-        with open("/etc/hosts", "r") as f:
+        with open(HOSTS_FILE_PATH, "r") as f:
             file_content = f.read()
         file_lines = file_content.splitlines(True)
 
@@ -86,18 +91,28 @@ class HostsManager(object):
         begin_index = None
         end_index = None
         for i, line in enumerate(file_lines):
-            if line == _BEGIN_MARKER:
+            if line == REDIRECTOR_BEGIN_MARKER:
                 begin_index = i
-            if line == _END_MARKER:
+            if line == REDIRECTOR_END_MARKER:
                 end_index = i
 
         # Make sure the redirector block is correct if found
         if begin_index is not None and end_index is None:
-            raise HostsManagerError("Only the BEGIN marker was found in the /etc/hosts file.")
+            raise HostsManagerError(
+                "Only the BEGIN marker was found in the /etc/hosts file."
+            )
         if begin_index is None and end_index is not None:
-            raise HostsManagerError("Only the END marker was found in the /etc/hosts file.")
-        if begin_index is not None and end_index is not None and begin_index > end_index:
-            raise HostsManagerError("The END marker was found before BEGIN marker in the /etc/hosts file.")
+            raise HostsManagerError(
+                "Only the END marker was found in the /etc/hosts file."
+            )
+        if (
+            begin_index is not None
+            and end_index is not None
+            and begin_index > end_index
+        ):
+            raise HostsManagerError(
+                "The END marker was found before BEGIN marker in the /etc/hosts file."
+            )
 
         return (file_lines, begin_index, end_index)
 
@@ -134,7 +149,7 @@ class HostsManager(object):
             final_lines.extend(self._generate_redirector_block_content())
 
             # Add the content after the END marker
-            final_lines.extend(original_lines[end_index + 1:len(original_lines)])
+            final_lines.extend(original_lines[end_index + 1 : len(original_lines)])
 
         # Rewrite the /etc/hosts file
         self._rewrite_hosts_file(final_lines)
@@ -151,10 +166,11 @@ class HostsManager(object):
 
         # If the markers are present
         if begin_index is not None and end_index is not None:
+            logging.debug("Clearing redirector block from /etc/hosts")
 
             # Remove the block from the lines
             final_lines = original_lines[0:begin_index]
-            final_lines.extend(original_lines[end_index + 1:len(original_lines)])
+            final_lines.extend(original_lines[end_index + 1 : len(original_lines)])
 
             # Rewrite the /etc/hosts file
             self._rewrite_hosts_file(final_lines)
@@ -171,9 +187,10 @@ class HostsManager(object):
 
         # If the markers are present
         if begin_index is not None and end_index is not None:
+            logging.debug(f"Loading {end_index - begin_index - 1} persisted entries from /etc/hosts")
 
             # Parse each line between the markers
-            for line in file_lines[begin_index + 1:end_index]:
+            for line in file_lines[begin_index + 1 : end_index]:
                 res = re.search("^([^ ]+) +(.+)\n$", line)
 
                 # Add the extracted hostname and IP to the entries
@@ -181,7 +198,9 @@ class HostsManager(object):
                     ip, hostname = res.groups()
                     self._entries[hostname] = ip
                 else:
-                    raise HostsManagerError("Failed to parse the redirector block in the /etc/hosts file.")
+                    raise HostsManagerError(
+                        "Failed to parse the redirector block in the /etc/hosts file."
+                    )
 
     def upsert_entry(self, local_host, backend_host):
         """Update or insert an entry in the /etc/hosts file.
@@ -197,6 +216,7 @@ class HostsManager(object):
 
         # Update the /etc/hosts file if the entry didn't exist or changed
         if local_host not in self._entries or self._entries[local_host] != backend_ip:
+            logging.debug(f'Updating /etc/hosts entry: {local_host} -> {backend_ip}')
             self._entries[local_host] = backend_ip
             self._upsert_redirector_block()
 
@@ -208,7 +228,9 @@ class HostsManager(object):
         :raises: HostsManagerError in case of error
         """
 
-        unexpected_hostnames = set(self._entries.keys()).difference(set(expected_hostnames))
+        unexpected_hostnames = set(self._entries.keys()).difference(
+            set(expected_hostnames)
+        )
 
         if len(unexpected_hostnames) > 0:
 

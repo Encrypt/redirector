@@ -1,6 +1,18 @@
-# Compiled code
+# Python cache
 __pycache__/
 
-# Packaging
+# Virtual environment
+.venv/
+venv/
+
+# Testing
+.pytest_cache/
+.coverage
+
+# Build/Distribution
 *.egg-info/
 dist/
+build/
+
+# IDE
+.vscode/
