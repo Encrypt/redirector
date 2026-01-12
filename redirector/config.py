@@ -2,6 +2,7 @@ from cerberus import Validator
 from redirector.healthchecks import healthchecks, schemas
 from redirector.strategies import strategies
 
+import logging
 import os
 import yaml
 
@@ -102,6 +103,7 @@ class ConfigLoader(object):
         """
 
         # Load the YAML configuration
+        logging.debug(f'Loading core configuration from "{self._config_file}"')
         try:
             with open(self._config_file, "r") as f:
                 config = yaml.safe_load(f)
@@ -112,6 +114,7 @@ class ConfigLoader(object):
 
         # Handle empty/commented YAML files
         if config is None:
+            logging.debug("Configuration file is empty or contains only comments, using defaults")
             config = {}
 
         # Validate the configuration file
@@ -144,6 +147,8 @@ class ConfigLoader(object):
         for config_file in os.listdir(self._lb_configs_dir):
             if config_file.endswith((".yml", ".yaml")):
                 config_files.append(config_file)
+
+        logging.debug(f"Found {len(config_files)} load balancer configuration file(s) in {self._lb_configs_dir}")
 
         # For each configuration file...
         for config_file in config_files:

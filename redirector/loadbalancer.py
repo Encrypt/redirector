@@ -33,6 +33,11 @@ class LoadBalancer(Thread):
         self._queue = queue
         self._stop_event = Event()
 
+        logging.debug(
+            f'Load balancer "{self._lb_name}" initialized with {len(self._backend_hosts)} backend host(s) '
+            f'using {config["strategy"]} strategy and {config["healthcheck"]["type"]} healthcheck'
+        )
+
     def run(self):
         """Run the load balancer.
 

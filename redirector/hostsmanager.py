@@ -3,6 +3,7 @@ from redirector.constants import (
     REDIRECTOR_BEGIN_MARKER,
     REDIRECTOR_END_MARKER,
 )
+import logging
 import os
 import re
 import socket
@@ -165,6 +166,7 @@ class HostsManager(object):
 
         # If the markers are present
         if begin_index is not None and end_index is not None:
+            logging.debug("Clearing redirector block from /etc/hosts")
 
             # Remove the block from the lines
             final_lines = original_lines[0:begin_index]
@@ -185,6 +187,7 @@ class HostsManager(object):
 
         # If the markers are present
         if begin_index is not None and end_index is not None:
+            logging.debug(f"Loading {end_index - begin_index - 1} persisted entries from /etc/hosts")
 
             # Parse each line between the markers
             for line in file_lines[begin_index + 1 : end_index]:
@@ -213,6 +216,7 @@ class HostsManager(object):
 
         # Update the /etc/hosts file if the entry didn't exist or changed
         if local_host not in self._entries or self._entries[local_host] != backend_ip:
+            logging.debug(f'Updating /etc/hosts entry: {local_host} -> {backend_ip}')
             self._entries[local_host] = backend_ip
             self._upsert_redirector_block()
 

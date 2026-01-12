@@ -1,0 +1,7 @@
+---
+# Test configuration with DEBUG logging
+log_level: "DEBUG"
+
+# Path to the load balancers configuration directory
+lb_configs_dir: "lb_configs"
+...
